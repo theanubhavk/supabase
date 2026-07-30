@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 import { AlertDescription, AlertTitle, buttonVariants, cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -56,7 +56,7 @@ export function SpendCapDisabledSection({ currentDiskSizeGb }: SpendCapDisabledS
             <div className="mt-3">
               <Link
                 href={`/org/${org?.slug}/billing?panel=costControl`}
-                className={cn(buttonVariants({ type: 'default', size: 'tiny' }))}
+                className={cn(buttonVariants({ variant: 'default', size: 'tiny' }))}
               >
                 Disable spend cap
               </Link>

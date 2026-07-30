@@ -7,10 +7,10 @@ import {
   ResizableHandle,
   ResizablePanel,
   Skeleton,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
@@ -30,6 +30,7 @@ import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { getRowTimestampMs } from './UnifiedLogs.utils'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import {
+  SERVICE_FLOW_TYPES,
   ServiceFlowType,
   useUnifiedLogInspectionQuery,
 } from '@/data/logs/unified-log-inspection-query'
@@ -63,8 +64,12 @@ export function ServiceFlowPanel({
   }, [selectedRowKey])
 
   const logType = selectedRow?.log_type
-  const serviceFlowType: ServiceFlowType | undefined =
-    logType === 'edge function' ? 'edge-function' : (logType as ServiceFlowType)
+  const normalizedLogType = logType === 'edge function' ? 'edge-function' : logType
+  const serviceFlowType: ServiceFlowType | undefined = SERVICE_FLOW_TYPES.includes(
+    normalizedLogType as ServiceFlowType
+  )
+    ? (normalizedLogType as ServiceFlowType)
+    : undefined
   const shouldShowServiceFlow = !!serviceFlowType
 
   useEffect(() => {
@@ -74,6 +79,8 @@ export function ServiceFlowPanel({
   }, [shouldShowServiceFlow, activeTab])
 
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
+
+  const timestampMs = getRowTimestampMs(selectedRow)
 
   // Query the logs API directly
   const {
@@ -86,13 +93,13 @@ export function ServiceFlowPanel({
       logId: selectedRow?.id,
       type: serviceFlowType,
       search: searchParameters,
+      logTimestampMs: timestampMs,
     },
     { enabled: Boolean(selectedRow?.id) && Boolean(serviceFlowType) }
   )
 
   if (!selectedRowKey || !selectedRow) return null
 
-  const timestampMs = getRowTimestampMs(selectedRow)
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
   // Prepare JSON data for Raw JSON tab
@@ -233,7 +240,7 @@ export function ServiceFlowPanel({
               <div className="sticky top-2 z-10 flex justify-end px-2 -mb-9 pointer-events-none">
                 <Button
                   size="tiny"
-                  type="default"
+                  variant="default"
                   className="pointer-events-auto px-1.5"
                   icon={jsonCopied ? <Check size={12} /> : <Copy size={12} />}
                   onClick={() => {

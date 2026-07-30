@@ -22,7 +22,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
   PageSection,
@@ -210,7 +210,7 @@ export const SSLConfiguration = () => {
                 {!hasSSLCertificate ? (
                   <ButtonTooltip
                     disabled
-                    type="default"
+                    variant="default"
                     icon={<Download />}
                     tooltip={{
                       content: {
@@ -222,7 +222,7 @@ export const SSLConfiguration = () => {
                     Download certificate
                   </ButtonTooltip>
                 ) : (
-                  <Button type="default" icon={<Download />}>
+                  <Button variant="default" icon={<Download />}>
                     <a href={sslCertificateUrl}>Download certificate</a>
                   </Button>
                 )}

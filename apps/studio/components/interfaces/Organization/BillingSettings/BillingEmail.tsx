@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Form, FormControl, FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { FormMessage, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -24,7 +24,7 @@ import {
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -61,7 +61,10 @@ const BillingEmail = () => {
       additionalBillingEmails: billingCustomer?.additional_emails ?? [],
     },
   })
-  const { additionalBillingEmails } = form.watch()
+  const additionalBillingEmails = useWatch({
+    control: form.control,
+    name: 'additionalBillingEmails',
+  })
   const { errors } = form.formState
   const additionalEmailsError = errors.additionalBillingEmails ?? []
 

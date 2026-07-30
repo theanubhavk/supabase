@@ -96,6 +96,8 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault()
         handleSubmit()
+      } else if (event.key === 'Escape') {
+        event.currentTarget.blur()
       }
     }
 
@@ -141,7 +143,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
               {loading ? (
                 onStop ? (
                   <ButtonTooltip
-                    type="outline"
+                    variant="outline"
                     aria-label="Stop response"
                     icon={<Square fill="currentColor" className="scale-75" />}
                     onClick={onStop}
@@ -153,7 +155,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
                 )
               ) : (
                 <ButtonTooltip
-                  htmlType="submit"
+                  type="submit"
                   aria-label="Send message"
                   icon={<ArrowUp />}
                   disabled={!canSubmit}

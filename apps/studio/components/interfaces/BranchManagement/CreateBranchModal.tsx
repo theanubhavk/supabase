@@ -8,7 +8,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -41,8 +41,9 @@ import {
   estimateRestoreTime,
 } from './BranchManagement.utils'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { BranchingPITRNotice } from '@/components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -93,8 +94,8 @@ export const CreateBranchModal = () => {
       .string()
       .min(1, 'Branch name cannot be empty')
       .refine(
-        (val) => /^[a-zA-Z0-9\-_]+$/.test(val),
-        'Branch name can only contain alphanumeric characters, hyphens, and underscores.'
+        (val) => /^[a-zA-Z0-9\-_/]+$/.test(val),
+        'Only letters, numbers, hyphens, underscores, and forward slashes are allowed.'
       )
       .refine(
         (val) => (branches ?? []).every((branch) => branch.name !== val),
@@ -105,13 +106,16 @@ export const CreateBranchModal = () => {
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onSubmit',
+    mode: 'onChange',
     reValidateMode: 'onBlur',
     resolver: zodResolver(FormSchema),
     defaultValues: { branchName: '', gitBranchName: '', withData: false },
   })
 
-  const { withData, gitBranchName } = form.watch()
+  const [withData, gitBranchName] = useWatch({
+    control: form.control,
+    name: ['withData', 'gitBranchName'],
+  })
   const debouncedGitBranchName = useDebounce(gitBranchName, 500)
 
   const {
@@ -307,7 +311,7 @@ export const CreateBranchModal = () => {
                 control={form.control}
                 name="branchName"
                 render={({ field }) => (
-                  <FormItemLayout label="Preview Branch Name">
+                  <FormItemLayout label="Preview branch name">
                     <FormControl>
                       <Input
                         {...field}
@@ -398,7 +402,7 @@ export const CreateBranchModal = () => {
                         Keep this preview branch in sync with a chosen GitHub branch
                       </p>
                     </div>
-                    <Button type="default" icon={<Github />} onClick={handleGitHubClick}>
+                    <Button variant="default" icon={<Github />} onClick={handleGitHubClick}>
                       Configure
                     </Button>
                   </div>
@@ -522,9 +526,9 @@ export const CreateBranchModal = () => {
                                     <InlineLink
                                       onClick={() => setShowCreateBranchModal(false)}
                                       className="pointer-events-auto"
-                                      href={`/project/${ref}/settings/compute-and-disk`}
+                                      href={getInfrastructurePath(projectRef)}
                                     >
-                                      Compute and Disk
+                                      Infrastructure
                                     </InlineLink>
                                   </p>
                                 </TooltipContent>
@@ -604,7 +608,7 @@ export const CreateBranchModal = () => {
 
             <DialogFooter className="justify-end gap-2" padding="medium">
               <Button
-                type="default"
+                variant="default"
                 disabled={isCreatingBranch}
                 onClick={() => setShowCreateBranchModal(false)}
               >
@@ -614,8 +618,8 @@ export const CreateBranchModal = () => {
                 form={formId}
                 disabled={isDisabled}
                 loading={isCreatingBranch}
-                type={promptPlanUpgrade ? 'default' : 'primary'}
-                htmlType="submit"
+                variant={promptPlanUpgrade ? 'default' : 'primary'}
+                type="submit"
                 tooltip={{
                   content: {
                     side: 'bottom',
